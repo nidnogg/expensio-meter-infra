@@ -1,9 +1,12 @@
 const fs = require('fs');
 const path = require('path');
-
+const env = require('dotenv');
+require('dotenv').config()
 // File paths
 const lastFetchAtPath = '/Users/nidnogg/localdev/expensio-meter/data/last_fetch_at.json';
 const currencyDataPath = '/Users/nidnogg/localdev/expensio-meter/data/currency_data.json';
+const apiUrl = `https://api.currencyapi.com/v3/latest`
+const apiParams = `?apikey=${process.env.API_KEY}`
 
 const writeJson = (filePath, fileContent) => {
   fs.writeFile(filePath, fileContent, (err) => {
@@ -37,7 +40,7 @@ fs.readFile(lastFetchAtPath, 'utf8', (err, data) => {
       process.exit(1); 
     } else {
       // Fetch currency data
-      fetch('https://raw.githubusercontent.com/nidnogg/expensio-meter/main/data/currency_data.json')
+      fetch(`${apiUrl}${apiParams}`)
         .then(response => {
           if (!response.ok) {
             throw new Error('Network response was not ok');
@@ -52,9 +55,12 @@ fs.readFile(lastFetchAtPath, 'utf8', (err, data) => {
         })
         .catch(error => {
           console.error('There was a problem fetching the data:', error);
+          process.exit(1); 
+
         });
     }
   } catch (error) {
     console.error('Error parsing last fetch date JSON:', error);
+    process.exit(1); 
   }
 });
